@@ -2,9 +2,9 @@
 Es una aplicación trabajada con <b>Blazor Server</b> y <b>C#</b> usando <b>EF Core</b> con Microsoft SQL Server.
 
 # Agregar los paquetes por la terminal
-´´dotnet add package Microsoft.EntityFrameworkCore´´
-´´dotnet add package Microsoft.EntityFrameworkCore.SqlServer´´
-´´dotnet add package Microsoft.EntityFrameworkCore.Tools´´
+dotnet add package Microsoft.EntityFrameworkCore <br>
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer <br>
+dotnet add package Microsoft.EntityFrameworkCore.Tools <br>
 
 # Antes de crear las migraciones
 dotnet tool install --global dotnet-ef
