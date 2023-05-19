@@ -1,5 +1,6 @@
 using AgendaElectronica.Data;
 using AgendaElectronica.Data.Context;
+using AgendaElectronica.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -11,6 +12,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddDbContext<AgendaElectronicaDbContext>();
 builder.Services.AddScoped<IAgendaElectronicaDbContext, AgendaElectronicaDbContext>();
+builder.Services.AddScoped<IContactoServices, ContactoServices>();
 
 var app = builder.Build();
 
