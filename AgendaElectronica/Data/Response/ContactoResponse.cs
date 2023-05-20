@@ -1,4 +1,6 @@
-﻿namespace AgendaElectronica.Data.Response
+﻿using AgendaElectronica.Data.Request;
+
+namespace AgendaElectronica.Data.Response
 {
     public class ContactoResponse
     {
@@ -6,5 +8,15 @@
         public string Nombre { get; set; } = null!;
         public string Telefono { get; set; } = null!;
         public string Direccion { get; set; } = null!;
+
+        public ContactoRequest ToRequest() {
+            return new ContactoRequest
+            {
+                Id = Id,
+                Nombre = Nombre,
+                Telefono = Telefono,
+                Direccion = Direccion
+            };
+        }
     }
 }

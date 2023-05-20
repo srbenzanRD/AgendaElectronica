@@ -1,0 +1,91 @@
+﻿@page "/contactos"
+<h3>Contactos</h3>
+<div class="container">
+    @if (ShowForm)
+    {
+        <EditForm Model="request" OnValidSubmit="Send">
+            <div class="mb-3"> 
+                <label>Nombre</label>
+                <InputText @bind-Value="@request.Nombre"></InputText>
+            </div>
+            <div class="mb-3">
+                <label>Telefono</label>
+                <InputText @bind-Value="@request.Telefono"></InputText>
+            </div>
+            <div class="mb-3">
+                <label>Direccion</label>
+                <InputText @bind-Value="@request.Direccion"></InputText>
+            </div>
+        </EditForm>
+        <br/>
+    }
+    @foreach (var contacto in Contactos)
+    {
+        <div class="card"style="width:18rem;">
+            <div class="card-body">
+                <label class="card-title">@contacto.Nombre</label>
+                <div class="card-text">
+                    <label><b>Telefono:</b> @contacto.Telefono</label>
+                </div>
+                <button class="btn btn-warning" >Editar</button>
+                <button class="btn btn-danger" >Eliminar</button>
+            </div>
+        </div>
+    }
+</div>
+@code {
+    public bool ShowForm { get; set; } = false;
+    public string Filtro { get; set; } = "";
+    public List<ContactoResponse> Contactos { get; set; }
+        = new List<ContactoResponse>();
+
+    public ContactoRequest request { get; set; } = new ContactoRequest();
+
+    async Task CargarContactos()
+    {
+        var resultado =
+        await contactoServices.Consultar(Filtro);
+        if (resultado.Success)
+        {
+            Contactos = resultado.Data!;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarContactos();
+    }
+
+    public async Task Send()
+    {
+        if(request.Id == 0)
+        {
+            //Debo registrar el contacto..
+            var r = await contactoServices.Crear(request);
+            if (r.Success)
+            {
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            //Debo solicitar modificar el contacto...
+            var r = await contactoServices.Modificar(request);
+            if (r.Success)
+            {
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+    }
+
+    public void Seleccionar(int Id, bool showForm = true)
+    {
+        ShowForm = showForm;
+        request = Contactos
+        .Where(c => c.Id == Id)
+        .Select(c => c.ToRequest())
+        .FirstOrDefault()??new ContactoRequest();
+    }
+}
