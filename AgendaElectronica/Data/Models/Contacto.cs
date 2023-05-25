@@ -43,6 +43,7 @@ namespace AgendaElectronica.Data.Models
         public ContactoResponse ToResponse()
         => new()
         {
+            Id = Id,
             Nombre = Nombre,
             Telefono = Telefono,
             Direccion = Direccion
