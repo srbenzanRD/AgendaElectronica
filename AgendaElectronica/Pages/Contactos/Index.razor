@@ -27,6 +27,18 @@
                 <label class="input-group-text">Direccion</label>
                 <InputText class="form-control" @bind-Value="@request.Direccion"></InputText>
             </div>
+            <div class="mb-3 input-group">
+                <label class="input-group-text">Ciudad</label>
+                <select class="form-control" @bind="request.CiudadId">
+                    <option disabled>Selecciona una ciudad</option>
+                    @foreach (var ciudad in Ciudades)
+                    {
+                        <option value="@ciudad.Id">
+                            @ciudad.Nombre
+                            </option>
+                    }
+                </select>
+            </div>
             <div class="btn-group">
                 <button type="submit" class="btn btn-outline-success">Guardar</button>
                 <button @onclick="Cancelar" class="btn btn-outline-danger">Cancelar</button>
@@ -42,7 +54,8 @@
                 <div class="card-body">
                     <label class="card-title">@contacto.Nombre</label>
                     <div class="card-text">
-                        <label><b>Telefono:</b> @contacto.Telefono</label>
+                        <label>@contacto.Telefono</label>
+                        <label>@contacto.NombreCiudadtexto</label>
                     </div>
                     <button @onclick="()=>Seleccionar(contacto.Id)"
                             class="btn btn-warning">
@@ -66,6 +79,8 @@
     public List<ContactoResponse> Contactos { get; set; }
         = new List<ContactoResponse>();
 
+    public List<CiudadResponse> Ciudades { get; set; } = new List<CiudadResponse>();
+
     public ContactoRequest request { get; set; } = new ContactoRequest();
 
     void Cancelar()
@@ -73,7 +88,14 @@
         request  = new ContactoRequest();
         ShowForm = false;
     }
-
+    async Task CargarCiudades()
+    {
+        var resultado = await ciudadServices.Consultar();
+        if (resultado.Success)
+        {
+            Ciudades = resultado.Data!;
+        }
+    }
     async Task CargarContactos()
     {
         var resultado =
@@ -87,6 +109,7 @@
     protected override async Task OnInitializedAsync()
     {
         await CargarContactos();
+        await CargarCiudades();
     }
 
     public async Task Send()

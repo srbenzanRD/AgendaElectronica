@@ -3,6 +3,7 @@ using AgendaElectronica.Data.Context;
 using AgendaElectronica.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddDbContext<AgendaElectronicaDbContext>();
 builder.Services.AddScoped<IAgendaElectronicaDbContext, AgendaElectronicaDbContext>();
 builder.Services.AddScoped<IContactoServices, ContactoServices>();
-
+builder.Services.AddScoped<ICiudadesServices, CiudadesServices>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,4 +31,12 @@ app.UseRouting();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-app.Run();
+using (var serviceScope =  app.Services.GetService<IServiceScopeFactory>()!.CreateScope())
+{
+    var dbContext = serviceScope.ServiceProvider
+        .GetRequiredService<AgendaElectronicaDbContext>();
+    dbContext.Database.Migrate();
+    await AgendaElectronicaDbContextSeeder.Inicializar(dbContext);
+}
+
+    app.Run();

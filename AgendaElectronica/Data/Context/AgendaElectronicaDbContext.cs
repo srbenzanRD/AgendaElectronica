@@ -12,7 +12,7 @@ namespace AgendaElectronica.Data.Context
             this.config = config;
         }
         public DbSet<Contacto> Contactos { get; set; }
-
+        public DbSet<Ciudad> Ciudades { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(config.GetConnectionString("MSSQL"));

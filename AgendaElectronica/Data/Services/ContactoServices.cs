@@ -6,19 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AgendaElectronica.Data.Services
 {
-    public class Result
-    {
-        public bool Success{ get; set; }
-        public string? Message{ get; set; }
-
-    }
-    public class Result<T>
-    {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
-        public T? Data { get; set; }
-
-    }
     public class ContactoServices : IContactoServices
     {
         private readonly IAgendaElectronicaDbContext dbContext;
@@ -87,6 +74,7 @@ namespace AgendaElectronica.Data.Services
             try
             {
                 var contactos = await dbContext.Contactos
+                    .Include(c=>c.Ciudad)
                     .Where(c =>
                         (c.Nombre + " " + c.Telefono + " " + c.Direccion)
                         .ToLower()

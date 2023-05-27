@@ -1,6 +1,8 @@
 ﻿using AgendaElectronica.Data.Request;
 using AgendaElectronica.Data.Response;
+using Microsoft.AspNetCore.ResponseCaching;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AgendaElectronica.Data.Models
 {
@@ -11,6 +13,9 @@ namespace AgendaElectronica.Data.Models
         public string Nombre { get; set; } = null!;
         public string Telefono { get; set; } = null!;
         public string Direccion { get; set; } = null!;
+        public int? CiudadId { get; set; }
+        [ForeignKey("CiudadId")]
+        public virtual Ciudad? Ciudad { get; set; }
 
         public static Contacto Crear(ContactoRequest contacto)
         => new()
@@ -18,6 +23,7 @@ namespace AgendaElectronica.Data.Models
             Nombre = contacto.Nombre,
             Telefono = contacto.Telefono,
             Direccion = contacto.Direccion,
+            CiudadId = contacto.CiudadId
         };
         public bool Mofidicar(ContactoRequest contacto)
         {
@@ -37,6 +43,11 @@ namespace AgendaElectronica.Data.Models
                 Direccion = contacto.Direccion;
                 cambio = true;
             }
+            if(CiudadId != contacto.CiudadId)
+            {
+                CiudadId = contacto.CiudadId;
+                cambio = true;
+            }
             return cambio;
         }
 
@@ -46,7 +57,9 @@ namespace AgendaElectronica.Data.Models
             Id = Id,
             Nombre = Nombre,
             Telefono = Telefono,
-            Direccion = Direccion
+            Direccion = Direccion,
+            CiudadId = CiudadId,
+            Ciudad = Ciudad != null? Ciudad!.ToResponse():null
         };
     }
 }

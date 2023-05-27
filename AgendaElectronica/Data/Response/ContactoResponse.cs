@@ -7,7 +7,11 @@ namespace AgendaElectronica.Data.Response
         public int Id { get; set; }
         public string Nombre { get; set; } = null!;
         public string Telefono { get; set; } = null!;
-        public string Direccion { get; set; } = null!;
+        public string Direccion { get; set; } = null!; 
+        public int? CiudadId { get; set; }
+        public CiudadResponse? Ciudad { get; set; }
+
+        public string NombreCiudadtexto => Ciudad != null ? Ciudad.Nombre : "N/A";
 
         public ContactoRequest ToRequest() {
             return new ContactoRequest
@@ -15,7 +19,9 @@ namespace AgendaElectronica.Data.Response
                 Id = Id,
                 Nombre = Nombre,
                 Telefono = Telefono,
-                Direccion = Direccion
+                Direccion = Direccion,
+                CiudadId = CiudadId
+                
             };
         }
     }
