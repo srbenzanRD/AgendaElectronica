@@ -13,6 +13,7 @@ public class Producto
     public string Codigo { get; set; } = null!;
     public string Descripcion { get; set; } = null!;
     public int Stock { get; set; }
+    [Column(TypeName ="decimal(18,2)")]
     public decimal Precio { get; set; }
     public Producto Crear(ProductoRequest request) => new() {
         Codigo = request.Codigo,
