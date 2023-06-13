@@ -1,0 +1,43 @@
+﻿@page "/facturacion"
+<PageTitle>Módulo de facturación</PageTitle>
+<h3>Módulo de facturación</h3>
+@if (Facturas != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Monto</th>
+                <th scope="col">Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var f in Facturas)
+            {
+                <tr>
+                    <th scope="row">@f.Id</th>
+                    <td>@f.Contacto.Nombre</td>
+                    <td>@f.SubTotal.ToString("N2")</td>
+                    <td>@f.Fecha</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    async Task Consultar()
+    {
+        var resultado = await facturaServices.Consultar();
+        if (resultado.Success)
+        {
+            Facturas = resultado.Data??new List<FacturaRespose>();
+        }
+        StateHasChanged();
+    }
+    public List<FacturaRespose> Facturas { get; set; } = new List<FacturaRespose>();
+    protected override async Task OnInitializedAsync()
+    {
+        await Consultar();
+    }
+}

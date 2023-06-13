@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AgendaElectronicaDbContext>();
 builder.Services.AddScoped<IAgendaElectronicaDbContext, AgendaElectronicaDbContext>();
 builder.Services.AddScoped<IContactoServices, ContactoServices>();
 builder.Services.AddScoped<ICiudadesServices, CiudadesServices>();
+builder.Services.AddScoped<IFacturaServices,FacturaServices> ();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,5 +1,7 @@
 ﻿@page "/contactos"
 
+<PageTitle>AgendaElectronica - Contactos</PageTitle>
+<button @onclick="Navegar_A_Prueba">Ir a PRUEBA</button>
 @if (!ShowForm)
 {
     <h3>Contactos (@Contactos.Count)</h3>
@@ -15,6 +17,8 @@
     {
         <h3>@TituloForm</h3>
         <EditForm Model="request" OnValidSubmit="Send">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
             <div class="mb-3 input-group"> 
                 <label class="input-group-text">Nombre</label>
                 <InputText class="form-control" @bind-Value="@request.Nombre"></InputText>
@@ -82,7 +86,10 @@
     public List<CiudadResponse> Ciudades { get; set; } = new List<CiudadResponse>();
 
     public ContactoRequest request { get; set; } = new ContactoRequest();
-
+    void Navegar_A_Prueba()
+    {
+        navigator.NavigateTo("/prueba", true);
+    }
     void Cancelar()
     {
         request  = new ContactoRequest();
