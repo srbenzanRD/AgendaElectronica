@@ -1,0 +1,77 @@
+﻿<h3>@TituloForm</h3>
+<EditForm Model="request" OnValidSubmit="Send">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3 input-group">
+        <label class="input-group-text">Nombre</label>
+        <InputText class="form-control" @bind-Value="@request.Nombre"></InputText>
+    </div>
+    <div class="mb-3 input-group">
+        <label class="input-group-text">Telefono</label>
+        <InputText class="form-control" @bind-Value="@request.Telefono"></InputText>
+    </div>
+    <div class="mb-3 input-group">
+        <label class="input-group-text">Direccion</label>
+        <InputText class="form-control" @bind-Value="@request.Direccion"></InputText>
+    </div>
+    <div class="mb-3 input-group">
+        <label class="input-group-text">Ciudad</label>
+        <select class="form-control" @bind="request.CiudadId">
+            <option disabled>Selecciona una ciudad</option>
+            @foreach (var ciudad in Ciudades)
+            {
+                <option value="@ciudad.Id">
+                    @ciudad.Nombre
+                </option>
+            }
+        </select>
+    </div>
+    <div class="btn-group">
+        <button type="submit" class="btn btn-outline-success">Guardar</button>
+    </div>
+</EditForm>
+    <br />
+}
+@code {
+    public List<CiudadResponse> Ciudades { get; set; } = new List<CiudadResponse>();
+
+    public string TituloForm => request.Id == 0 ?
+    "Agregar contacto" : "Modificar contacto";
+    [Parameter]
+    public ContactoRequest request { get; set; } = new ContactoRequest();
+
+    async Task CargarCiudades()
+    {
+        var resultado = await ciudadServices.Consultar();
+        if (resultado.Success)
+        {
+            Ciudades = resultado.Data!;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarCiudades();
+    }
+    public async Task Send()
+    {
+        if (request.Id == 0)
+        {
+            //Debo registrar el contacto..
+            var r = await contactoServices.Crear(request);
+            if (r.Success)
+            {
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            //Debo solicitar modificar el contacto...
+            var r = await contactoServices.Modificar(request);
+            if (r.Success)
+            {
+                StateHasChanged();
+            }
+        }
+    }
+}

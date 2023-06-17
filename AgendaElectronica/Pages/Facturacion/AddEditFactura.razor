@@ -1,0 +1,139 @@
+﻿@page "/facturacion/crear"
+<h3>Factura</h3>
+<EditForm Model="request" OnValidSubmit="Send">
+    @*Disenar el espacio para el cliente o contacto a facturarle*@
+    <div class="input-group mb-3">
+        <input 
+               class="form-control"
+               placeholder="Cliente"
+               aria-label="Cliente"
+               aria-describedby="button-addon2" list="contactos" />
+        <datalist id="contactos">
+          @foreach (var contacto in Contactos)
+            {
+                <option value="@contacto.Nombre" @onclick="()=>{request.ContactoId = contacto.Id;}" />
+            }
+        </datalist>
+        
+        <button 
+            class="btn btn-outline-success d-print-none"
+            type="button" id="button-addon2"
+        @onclick="async()=>{
+        await CargarContacto(); }">
+            Actualizar
+        </button>
+    </div>
+    @*Disenar el espacio para los productos a facturar*@
+    <div class="container">
+        <h5>Producto a cargar</h5>
+        <div class="input-group mb-3">
+            <input class="form-control"
+                   placeholder="Producto"
+                   aria-label="Producto"
+                   aria-describedby="button-addon2" list="productos"
+                   @onchange="(value)=>{
+                    var r = Productos.FirstOrDefault(p=>p.CodigoDescripcion == value.Value!.ToString());
+                    if(r!=null)
+                    BuscarPercio(r.Id);
+                    }"
+                   />
+            <datalist id="productos">
+                @foreach (var producto in Productos)
+                {
+                    <option value="@producto.CodigoDescripcion" @onclick="()=>BuscarPercio(producto.Id)" />
+                }
+            </datalist>
+            <span class="form-control">
+                $@Precio.ToString("N2")
+            </span>
+            <input class="form-control" type="number" @bind="@Cantidad"/>
+            <button class="btn btn-outline-success d-print-none"
+                    type="button" id="button-addon2"
+            @onclick="async()=>{
+        await CargarProducto(); }">
+                Actualizar
+            </button>
+            <button class="btn btn-success d-print-none"
+                    type="button" id="button-addon2"
+            @onclick="AgregarAlDetalle">
+                Cargar
+            </button>
+        </div>
+    </div>
+    @*Disenar los elementos que se cargan a la factura*@
+    <h5>Detalle de la factura</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cantidad</th>
+                <th>Descripcion</th>
+                <th>Precio</th>
+                <th>SubTotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detalle in request.Detalles)
+            {
+                <tr>
+                    <td>@detalle.Cantidad</td>
+                    <td>@detalle.Descripcion</td>
+                    <td>@detalle.Precio</td>
+                    <td>@detalle.SubTotal</td>
+                </tr>
+            }
+        </tbody>
+    
+    </table>
+</EditForm>
+@code {
+    public List<ContactoResponse> Contactos { get; set; } = new List<ContactoResponse>();
+    public List<ProductoResponse> Productos { get; set; } = new List<ProductoResponse>();
+    public FacturaRequest request { get; set; } = new FacturaRequest();
+    public decimal Precio { get; set; } = 0;
+    public int Cantidad { get; set; } = 1;
+    public int IdProducto { get; set; } = 0;
+    void BuscarPercio(int idProducto)
+    {
+        Precio = Productos.FirstOrDefault(p => p.Id == idProducto)!.Precio;
+        IdProducto = idProducto;
+    }
+    void AgregarAlDetalle()
+    {
+        var r = Productos.FirstOrDefault(p => p.Id ==IdProducto);
+        request.Detalles.Add(new()
+            {
+                ProductoId = IdProducto,
+                Descripcion = r!.Descripcion,
+                Precio = r.Precio,
+                Cantidad = Cantidad
+            });
+    }
+    async Task CargarContacto()
+    { 
+        //Llenar la lista de contactos para mostrar al usuario...
+        var r = await contactoServices.Consultar("");
+        if (r.Success)
+        {
+            Contactos = r.Data!;
+        }
+    }
+    async Task CargarProducto()
+    { 
+        //Llenar la lista de contactos para mostrar al usuario...
+        var r = await productoServices.Consultar("");
+        if (r.Success)
+        {
+            Productos = r.Data!;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarContacto();
+        await CargarProducto();
+    }
+    async Task Send()
+    {
+        await Task.Delay(2);
+    }
+}

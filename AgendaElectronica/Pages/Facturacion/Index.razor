@@ -1,6 +1,18 @@
 ﻿@page "/facturacion"
 <PageTitle>Módulo de facturación</PageTitle>
-<h3>Módulo de facturación</h3>
+<div class="row">
+    <div class="col">
+        <h3 class="d-print-none">Módulo de facturación</h3>
+        <h3 class="d-none d-print-block">Reporte de facturaciones</h3>
+    </div>
+    <div class="col">
+        <button 
+            class="btn btn-outline-success" 
+            @onclick='()=>{navigator.NavigateTo("/facturacion/crear");}'>
+            <span class="oi oi-plus"></span>
+        </button>
+    </div>
+</div>
 @if (Facturas != null)
 {
     <table class="table">

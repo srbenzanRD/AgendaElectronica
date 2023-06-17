@@ -7,4 +7,6 @@ public class ProductoResponse
     public string Descripcion { get; set; } = null!;
     public int Stock { get; set; }
     public decimal Precio { get; set; }
+
+    public string CodigoDescripcion => $"({Codigo}) {Descripcion}";
 }

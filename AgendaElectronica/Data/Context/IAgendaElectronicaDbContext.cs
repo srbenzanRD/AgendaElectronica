@@ -9,7 +9,7 @@ namespace AgendaElectronica.Data.Context
         public DbSet<Ciudad> Ciudades { get; set; }
         public DbSet<Factura> Facturas { get; set; }
         public DbSet<FacturaDetalle> FacturasDetalles { get; set; }
-
+        public DbSet<Producto> Producto { get; set; }
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

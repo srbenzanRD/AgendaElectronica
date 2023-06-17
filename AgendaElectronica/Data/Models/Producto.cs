@@ -23,6 +23,7 @@ public class Producto
     };
     public ProductoResponse ToResponse() => new() { 
         Id = Id, 
+        Codigo = Codigo,
         Descripcion = Descripcion,
         Stock = Stock,
         Precio = Precio
