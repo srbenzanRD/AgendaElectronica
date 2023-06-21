@@ -9,8 +9,8 @@ public class FacturaDetalle
 {
     public FacturaDetalle()
     {
-        Factura = new Factura();
-        Producto = new Producto();
+        //Factura = new Factura();
+        //Producto = new Producto();
     }
 
     [Key]

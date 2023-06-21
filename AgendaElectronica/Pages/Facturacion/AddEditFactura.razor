@@ -1,17 +1,25 @@
 ﻿@page "/facturacion/crear"
 <h3>Factura</h3>
 <EditForm Model="request" OnValidSubmit="Send">
+    @if (Message != null)
+    {
+        <div class="alert-danger">
+            <span class="text-danger">@Message</span>
+        </div>
+    }
     @*Disenar el espacio para el cliente o contacto a facturarle*@
     <div class="input-group mb-3">
         <input 
                class="form-control"
                placeholder="Cliente"
                aria-label="Cliente"
-               aria-describedby="button-addon2" list="contactos" />
+               aria-describedby="button-addon2" list="contactos"
+               @bind="Nombre"
+               />
         <datalist id="contactos">
           @foreach (var contacto in Contactos)
             {
-                <option value="@contacto.Nombre" @onclick="()=>{request.ContactoId = contacto.Id;}" />
+                <option value="@contacto.Nombre" @onclick="()=>BuscarSeleccionarCliente(contacto.Nombre)" />
             }
         </datalist>
         
@@ -20,12 +28,15 @@
             type="button" id="button-addon2"
         @onclick="async()=>{
         await CargarContacto(); }">
-            Actualizar
+            <span class="oi oi-reload"></span>
         </button>
     </div>
     @*Disenar el espacio para los productos a facturar*@
-    <div class="container">
-        <h5>Producto a cargar</h5>
+    <div class="card p-2">
+        <div class="card-header card-title">
+            <h3 class="">¿Que desea el cliente?</h3>
+        </div>
+        <small class="p-2">Aquí puedes detallar lo que le cargaras a la factura al cliente...</small>
         <div class="input-group mb-3">
             <input class="form-control"
                    placeholder="Producto"
@@ -43,20 +54,24 @@
                     <option value="@producto.CodigoDescripcion" @onclick="()=>BuscarPercio(producto.Id)" />
                 }
             </datalist>
-            <span class="form-control">
-                $@Precio.ToString("N2")
-            </span>
-            <input class="form-control" type="number" @bind="@Cantidad"/>
+            
             <button class="btn btn-outline-success d-print-none"
                     type="button" id="button-addon2"
             @onclick="async()=>{
         await CargarProducto(); }">
-                Actualizar
+                <span class="oi oi-reload"></span>
             </button>
+            
+        </div>
+        <div class="input-group mb-3">
+            <span class="form-control w-50">
+                $@Precio.ToString("N2")
+            </span>
+            <input class="form-control w-25" type="number" @bind="@Cantidad" />
             <button class="btn btn-success d-print-none"
                     type="button" id="button-addon2"
             @onclick="AgregarAlDetalle">
-                Cargar
+                <span class="oi oi-collapse-down"></span>
             </button>
         </div>
     </div>
@@ -65,27 +80,72 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Cantidad</th>
+                <th class="col w-25">
+                    Cantidad
+                </th>
                 <th>Descripcion</th>
-                <th>Precio</th>
-                <th>SubTotal</th>
+                <th class="col w-25">
+                    Precio
+                    </th>
+                <th class="col w-25">
+                    SubTotal
+                </th>
+                <th>
+                    ...
+                </th>
             </tr>
         </thead>
         <tbody>
             @foreach (var detalle in request.Detalles)
             {
                 <tr>
-                    <td>@detalle.Cantidad</td>
-                    <td>@detalle.Descripcion</td>
-                    <td>@detalle.Precio</td>
-                    <td>@detalle.SubTotal</td>
+                    <td class="col w-25 text-center">
+                        <InputNumber 
+                            class="form-control" 
+                            @bind-Value="@detalle.Cantidad" />
+                    </td>
+                    <td class="col w-100">
+                        @detalle.Descripcion
+                     </td>
+                    <td class="col w-25">
+                        @detalle.Precio.ToString("C2")
+                     </td>
+                    <td class="col w-25">
+                        @detalle.SubTotal.ToString("C2")
+                    </td>
+                    <td>
+                        <button 
+                            type="button"
+                            class="btn btn-outline-danger"
+                        @onclick="()=>EliminarDetalle(detalle.ProductoId)">
+                    <span 
+                        class="oi oi-trash">
+
+                    </span>
+                    </button>
+                    </td>
                 </tr>
             }
         </tbody>
-    
     </table>
+    <div class="card mb-3 p-3">
+        <h5 class="card-header">Resumen</h5>
+        <div class="card-body">
+            <label>Total:</label>
+            @request.SubTotal.ToString("C2")
+            <div class="mb-3">
+                <button 
+                    class="btn btn-success" 
+                    type="submit">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
 </EditForm>
 @code {
+    public string? Message { get; set; } = null;
+    public string Nombre { get; set; } = string.Empty;
     public List<ContactoResponse> Contactos { get; set; } = new List<ContactoResponse>();
     public List<ProductoResponse> Productos { get; set; } = new List<ProductoResponse>();
     public FacturaRequest request { get; set; } = new FacturaRequest();
@@ -97,16 +157,38 @@
         Precio = Productos.FirstOrDefault(p => p.Id == idProducto)!.Precio;
         IdProducto = idProducto;
     }
+    void BuscarSeleccionarCliente(string Contacto)
+    {
+        var c = Contactos.FirstOrDefault(p => p.Nombre == Contacto)!;
+        if (c != null) request.ContactoId = c.Id;
+    }
+    void EliminarDetalle(int Id)
+    {
+        var detalle = request.Detalles
+        .FirstOrDefault(d => d.ProductoId == Id);
+        if (detalle != null)
+        {
+            request.Detalles.Remove(detalle);
+        }
+    }
     void AgregarAlDetalle()
     {
         var r = Productos.FirstOrDefault(p => p.Id ==IdProducto);
-        request.Detalles.Add(new()
-            {
-                ProductoId = IdProducto,
-                Descripcion = r!.Descripcion,
-                Precio = r.Precio,
-                Cantidad = Cantidad
-            });
+        var detalle = request.Detalles.FirstOrDefault(d => d.ProductoId == IdProducto);
+        if (detalle != null)
+        {
+            detalle.Cantidad += Cantidad;
+        }
+        else
+        {
+            request.Detalles.Add(new()
+                {
+                    ProductoId = IdProducto,
+                    Descripcion = r!.Descripcion,
+                    Precio = r.Precio,
+                    Cantidad = Cantidad
+                });
+        }
     }
     async Task CargarContacto()
     { 
@@ -134,6 +216,15 @@
     }
     async Task Send()
     {
-        await Task.Delay(2);
+        BuscarSeleccionarCliente(Nombre);
+        var result = await
+        facturaServices.Crear(request);
+        if (result.Success)
+        {
+            //navigator.NavigateTo("/facturacion");
+            Message = result.Message;
+        }
+        else Message = result.Message;
+
     }
 }

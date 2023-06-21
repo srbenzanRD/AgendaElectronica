@@ -9,7 +9,7 @@ public class Factura
 {
     public Factura()
     {
-        Contacto = new Contacto();
+        //Contacto = new Contacto();
         Detalles = new List<FacturaDetalle>();
     }
     [Key]
